@@ -35,11 +35,11 @@ Período Académico: 2025-2
 
 ## Características del Curso
 
-- **📚 Teoría Sólida**: Explicaciones claras con analogías del mundo real
-- **💻 Código Ejecutable**: Ejemplos que puedes correr y modificar
-- **🎯 Ejercicios Prácticos**: Problemas reales con soluciones detalladas
-- **🚀 Proyectos Completos**: Sistemas que integran múltiples conceptos
-- **📖 Documentación Clara**: Explicaciones paso a paso para cada concepto
+- **Teoría Sólida**: Explicaciones claras con analogías del mundo real
+- **Código Ejecutable**: Ejemplos que puedes correr y modificar
+- **Ejercicios Prácticos**: Problemas reales con soluciones detalladas
+- **Proyectos Completos**: Sistemas que integran múltiples conceptos
+- **Documentación Clara**: Explicaciones paso a paso para cada concepto
 
 ---
 
