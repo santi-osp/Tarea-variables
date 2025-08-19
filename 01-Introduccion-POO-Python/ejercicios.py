@@ -16,7 +16,7 @@ print("\nEJERCICIO 1: CLASE ESTUDIANTE")
 print("-" * 40)
 
 class Estudiante:
-    def __init__(self, nombre:str, edad:str, carrera:str):
+    def __init__(self, nombre:str, edad:int, carrera:str):
         self.nombre = nombre
         self.edad = edad
         self.carrera = carrera
