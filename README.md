@@ -1,57 +1,46 @@
 # Curso de Programación de Software
 
 ## Descripción del Curso
-Material completo del curso de Programación de Software organizado por módulos para facilitar el aprendizaje.
+Material completo del curso de Programación de Software organizado por módulos para facilitar el aprendizaje. Cada módulo incluye teoría detallada, ejemplos prácticos, ejercicios resueltos y casos de uso del mundo real.
 
 ## Estructura del Curso
 
 ### [Módulo 1: Introducción a POO en Python](./01-Introduccion-POO-Python/)
-- Conceptos básicos de Programación Orientada a Objetos
-- Clases y objetos en Python
-- Encapsulación, herencia y polimorfismo
-- Ejercicios prácticos
-
-### [Módulo 2: Estructuras de Datos](./02-Estructuras-Datos/)
-- Listas, tuplas, diccionarios
-- Pilas y colas
-- Árboles y grafos básicos
-
-### [Módulo 3: Algoritmos y Complejidad](./03-Algoritmos-Complejidad/)
-- Análisis de algoritmos
-- Notación Big O
-- Algoritmos de búsqueda y ordenamiento
-
-### [Módulo 4: Programación Funcional](./04-Programacion-Funcional/)
-- Funciones lambda
-- Map, filter, reduce
-- Decoradores
-
-### [Módulo 5: Manejo de Excepciones](./05-Manejo-Excepciones/)
-- Try-catch en Python
-- Creación de excepciones personalizadas
-- Buenas prácticas
-
-### [Módulo 6: Archivos y Persistencia](./06-Archivos-Persistencia/)
-- Lectura y escritura de archivos
-- JSON y CSV
-- Bases de datos básicas
-
-## Objetivos del Curso
-- Comprender los fundamentos de la programación orientada a objetos
-- Desarrollar habilidades para resolver problemas mediante programación
-- Aprender buenas prácticas de desarrollo de software
-- Crear aplicaciones funcionales en Python
-
-## Tecnologías Utilizadas
-- **Lenguaje Principal**: Python 3.x
-- **IDE Recomendado**: VS Code, PyCharm
-- **Herramientas**: Git, GitHub
+- **Teoría completa** con analogías del mundo real
+- **Conceptos fundamentales**: Clases, objetos, atributos, métodos
+- **Principios POO**: Encapsulación, herencia, polimorfismo
+- **Sistema completo** de gestión de vehículos
+- **Ejercicios prácticos** con soluciones detalladas
+- **Ejemplos ejecutables** paso a paso
 
 ## Docente
 **Alejandro Salgar Marín**  
 Instituto Tecnológico Metropolitano (ITM)  
-2025-2
+Período Académico: 2025-2
+
+## Cómo Usar Este Repositorio
+
+### **Para Estudiantes:**
+1. **Clona el repositorio**: `git clone [URL]`
+2. **Navega por módulos**: Comienza con el Módulo 1 y avanza secuencialmente
+3. **Ejecuta ejemplos**: Cada módulo incluye código ejecutable
+4. **Practica ejercicios**: Resuelve los ejercicios antes de ver las soluciones
+5. **Experimenta**: Modifica el código y observa los cambios
+
+### **Para Instructores:**
+- **Material listo para usar**: Cada módulo está completo y autocontenido
+- **Ejercicios graduados**: Dificultad progresiva desde básico hasta avanzado
+- **Casos de uso reales**: Ejemplos aplicables a situaciones del mundo real
+- **Flexibilidad**: Fácil de adaptar a diferentes estilos de enseñanza
+
+## Características del Curso
+
+- **📚 Teoría Sólida**: Explicaciones claras con analogías del mundo real
+- **💻 Código Ejecutable**: Ejemplos que puedes correr y modificar
+- **🎯 Ejercicios Prácticos**: Problemas reales con soluciones detalladas
+- **🚀 Proyectos Completos**: Sistemas que integran múltiples conceptos
+- **📖 Documentación Clara**: Explicaciones paso a paso para cada concepto
 
 ---
 
-*¡Bienvenidos al mundo de la programación!*
+*¡Bienvenidos al mundo de la programación! Este curso te llevará desde los fundamentos hasta la creación de aplicaciones complejas.*
