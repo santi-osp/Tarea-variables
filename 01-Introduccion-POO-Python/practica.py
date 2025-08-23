@@ -115,4 +115,4 @@ while True:
 
 
 # terminar todas las opciones que son 2, 3, 4, ajustar la 5 para que imprima el objeto y no la referencia de memoria
-# Validar que todos los input sean del valor deseado, mostrando errores por consola
+# Validar que todos los input sean del valor deseado, mostrando errores por consola sin try catch
