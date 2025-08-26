@@ -27,9 +27,9 @@ class CuentaBancaria:
             print(f"Se retira del saldo {self._saldo} el monto de {monto}")
         else:
             print(f"no se puede retirar un monto mayor al saldo de la cuenta")
-
-        def __str__(self) -> str:
-            return f"{self.nombre}, se creo esta persona con el documneto {self.documento}"
+    
+    def __str__(self):
+        return f"Titular: {self.titutar.nombre}, Saldo: {self._saldo}"
         
 class CuentaAhorro(CuentaBancaria):
     def __init__(self, titular, saldo = 0, interes: float = 0.02):
@@ -40,6 +40,9 @@ class CuentaAhorro(CuentaBancaria):
         ganancia = self._saldo * self.interes
         self._saldo += ganancia
         print(f"interes aplicado y su nuevo saldo es {self._saldo}")
+
+    def __str__(self):
+        return f"Cuenta de Ahorros - {super().__str__()}, Interés: {self.interes}"
 
 
 class CuentaCorriente(CuentaBancaria):
@@ -53,6 +56,9 @@ class CuentaCorriente(CuentaBancaria):
             print(f"Se retira del saldo {self._saldo} el monto de {monto}")
         else:
             print(f"no se puede retirar un monto mayor al saldo de la cuenta")
+    
+    def __str__(self):
+        return f"Cuenta Corriente - {super().__str__()}, Límite de sobregiro: {self.limite_de_sobregiro}"
 
 
 class Banco:
@@ -61,13 +67,13 @@ class Banco:
         self.cuentas = []
 
     def crear_cuentar(self, titular, tipo="ahorros") -> list:
-        if tipo == "ahorro":
+        if tipo == "ahorros":
             cuenta = CuentaAhorro(titular)
         else:
             cuenta = CuentaCorriente(titular)
         self.cuentas.append(cuenta)
         print(f"cuenta brancaria {self.nombre}")
-        return cuenta
+        return self.cuentas
     
     def mostrar_cuentas(self):
         if not self.cuentas:
@@ -84,16 +90,26 @@ while True:
     print("1. crear una persona y una cuenta")
     print("2. Depositar")
     print("3. Retirar")
-    print("4. APlicar interes a una cuenta de ahorros")
+    print("4. Aplicar interés a una cuenta de ahorros")
     print("5. Mostrar cuentas")
     print("6. Salir")
     # continuar con las demas opciones
     
     
     #Consultar como validar que este input sea un numero del 1 al 6
-    opcion = input("Elige una opcion: ")
+    opcion = input("Elige una opción: ")
+    if opcion.isdigit(): #isdigit es un metodo que verifica si el input es un numero entero postivio
+        opcion = int(opcion)
+        if opcion < 1 or opcion > 6:
+            print("Debes ingresar un número entre 1 y 6.")
+        else:
+            print("Opcion no valida")
+    else:
+        print("Debes ingresar un número entero.")
+        print("Opcion no valida")
+
     
-    if opcion == "1":
+    if opcion == 1:
         nombre = input("Ingrese el nombre de la persona ")
         documento = input("ingrese el documento de la persona ")
         persona = Persona(nombre=nombre,documento=documento)
@@ -102,17 +118,58 @@ while True:
         #Validar tipo de dato entre str ahorro o corriente
         tipo = input("Escriba ahorros o corriente ").lower()
         banco.crear_cuentar(persona,tipo)
+    
+    elif opcion == 2:
+        if not banco.cuentas:
+            print("No hay cuentas registradas para depositar.")
+        else:
+            banco.mostrar_cuentas()
+            num = input("Selecciona el número de cuenta para depositar: ")
+            if num.isdigit() and 1 <= int(num) <= len(banco.cuentas):
+                cuenta = banco.cuentas[int(num)-1]
+                monto = input("Monto a depositar: ")
+                if monto.replace('.', '', 1).isdigit() and float(monto) > 0:
+                    cuenta.depositar(float(monto))
+                else:
+                    print("Monto inválido.")
+            else:
+                print("Cuenta inválida.")
 
-    elif opcion == "5":
+    elif opcion == 3:
+        if not banco.cuentas:
+            print("No hay cuentas registradas para retirar.")
+        else:
+            banco.mostrar_cuentas()
+            num = input("Selecciona el número de cuenta para retirar: ")
+            if num.isdigit() and 1 <= int(num) <= len(banco.cuentas):
+                cuenta = banco.cuentas[int(num)-1]
+                monto = input("Monto a retirar: ")
+                if monto.replace('.', '', 1).isdigit() and float(monto) > 0:
+                    cuenta.retirar(float(monto))
+                else:
+                    print("Monto inválido.")
+            else:
+                print("Cuenta inválida.")
+
+    elif opcion == 4:
+        if not banco.cuentas:  
+            print("No hay cuentas registradas para aplicar interes.")
+        else:
+            banco.mostrar_cuentas()
+            num = input("Selecciona el número de cuenta para aplicar interés: ")
+        if num.isdigit() and 1 <= int(num) <= len(banco.cuentas):
+            cuenta = banco.cuentas[int(num)-1]
+            if isinstance(cuenta, CuentaAhorro):
+                cuenta.calcular_interes()
+            else:
+                print("Solo se puede aplicar interés a cuentas de ahorros.")
+        else:
+            print("Cuenta inválida.")
+
+    elif opcion == 5:
         banco.mostrar_cuentas()
 
-    elif opcion == "6":
+    elif opcion == 6:
         print("Gracias por usar nuestra aplicacion")
         break
-
-    else:
-        print("Opcion no valida")
-
-
-# terminar todas las opciones que son 2, 3, 4, ajustar la 5 para que imprima el objeto y no la referencia de memoria
-# Validar que todos los input sean del valor deseado, mostrando errores por consola sin try catch
+    
