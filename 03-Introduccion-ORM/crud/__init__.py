@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 """
 Módulo de operaciones CRUD
 ==========================
@@ -11,3 +12,7 @@ from .categoria_crud import CategoriaCRUD
 from .producto_crud import ProductoCRUD
 
 __all__ = ['UsuarioCRUD', 'CategoriaCRUD', 'ProductoCRUD']
+=======
+# Módulo de operaciones CRUD
+
+>>>>>>> 5381fc36d68ac5f3de2d1cfa959718de1599f369

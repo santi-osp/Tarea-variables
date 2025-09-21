@@ -27,9 +27,15 @@ class CuentaBancaria:
             print(f"Se retira del saldo {self._saldo} el monto de {monto}")
         else:
             print(f"no se puede retirar un monto mayor al saldo de la cuenta")
+<<<<<<< HEAD
     
     def __str__(self):
         return f"Titular: {self.titutar.nombre}, Saldo: {self._saldo}"
+=======
+
+        def __str__(self) -> str:
+            return f"{self.nombre}, se creo esta persona con el documneto {self.documento}"
+>>>>>>> 5381fc36d68ac5f3de2d1cfa959718de1599f369
         
 class CuentaAhorro(CuentaBancaria):
     def __init__(self, titular, saldo = 0, interes: float = 0.02):
@@ -41,9 +47,12 @@ class CuentaAhorro(CuentaBancaria):
         self._saldo += ganancia
         print(f"interes aplicado y su nuevo saldo es {self._saldo}")
 
+<<<<<<< HEAD
     def __str__(self):
         return f"Cuenta de Ahorros - {super().__str__()}, Interés: {self.interes}"
 
+=======
+>>>>>>> 5381fc36d68ac5f3de2d1cfa959718de1599f369
 
 class CuentaCorriente(CuentaBancaria):
     def __init__(self, titular, saldo = 0, limite_de_sobregiro: float = 500):
@@ -56,9 +65,12 @@ class CuentaCorriente(CuentaBancaria):
             print(f"Se retira del saldo {self._saldo} el monto de {monto}")
         else:
             print(f"no se puede retirar un monto mayor al saldo de la cuenta")
+<<<<<<< HEAD
     
     def __str__(self):
         return f"Cuenta Corriente - {super().__str__()}, Límite de sobregiro: {self.limite_de_sobregiro}"
+=======
+>>>>>>> 5381fc36d68ac5f3de2d1cfa959718de1599f369
 
 
 class Banco:
@@ -67,13 +79,21 @@ class Banco:
         self.cuentas = []
 
     def crear_cuentar(self, titular, tipo="ahorros") -> list:
+<<<<<<< HEAD
         if tipo == "ahorros":
+=======
+        if tipo == "ahorro":
+>>>>>>> 5381fc36d68ac5f3de2d1cfa959718de1599f369
             cuenta = CuentaAhorro(titular)
         else:
             cuenta = CuentaCorriente(titular)
         self.cuentas.append(cuenta)
         print(f"cuenta brancaria {self.nombre}")
+<<<<<<< HEAD
         return self.cuentas
+=======
+        return cuenta
+>>>>>>> 5381fc36d68ac5f3de2d1cfa959718de1599f369
     
     def mostrar_cuentas(self):
         if not self.cuentas:
@@ -90,13 +110,18 @@ while True:
     print("1. crear una persona y una cuenta")
     print("2. Depositar")
     print("3. Retirar")
+<<<<<<< HEAD
     print("4. Aplicar interés a una cuenta de ahorros")
+=======
+    print("4. APlicar interes a una cuenta de ahorros")
+>>>>>>> 5381fc36d68ac5f3de2d1cfa959718de1599f369
     print("5. Mostrar cuentas")
     print("6. Salir")
     # continuar con las demas opciones
     
     
     #Consultar como validar que este input sea un numero del 1 al 6
+<<<<<<< HEAD
     opcion = input("Elige una opción: ")
     if opcion.isdigit(): #isdigit es un metodo que verifica si el input es un numero entero postivio
         opcion = int(opcion)
@@ -110,6 +135,11 @@ while True:
 
     
     if opcion == 1:
+=======
+    opcion = input("Elige una opcion: ")
+    
+    if opcion == "1":
+>>>>>>> 5381fc36d68ac5f3de2d1cfa959718de1599f369
         nombre = input("Ingrese el nombre de la persona ")
         documento = input("ingrese el documento de la persona ")
         persona = Persona(nombre=nombre,documento=documento)
@@ -118,6 +148,7 @@ while True:
         #Validar tipo de dato entre str ahorro o corriente
         tipo = input("Escriba ahorros o corriente ").lower()
         banco.crear_cuentar(persona,tipo)
+<<<<<<< HEAD
     
     elif opcion == 2:
         if not banco.cuentas:
@@ -173,3 +204,19 @@ while True:
         print("Gracias por usar nuestra aplicacion")
         break
     
+=======
+
+    elif opcion == "5":
+        banco.mostrar_cuentas()
+
+    elif opcion == "6":
+        print("Gracias por usar nuestra aplicacion")
+        break
+
+    else:
+        print("Opcion no valida")
+
+
+# terminar todas las opciones que son 2, 3, 4, ajustar la 5 para que imprima el objeto y no la referencia de memoria
+# Validar que todos los input sean del valor deseado, mostrando errores por consola sin try catch
+>>>>>>> 5381fc36d68ac5f3de2d1cfa959718de1599f369

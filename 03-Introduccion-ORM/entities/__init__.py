@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 """
 Módulo de entidades
 ==================
@@ -18,3 +19,7 @@ __all__ = [
     # Producto
     'Producto', 'ProductoCreate', 'ProductoUpdate', 'ProductoResponse'
 ]
+=======
+# Módulo de entidades del modelo de datos
+
+>>>>>>> 5381fc36d68ac5f3de2d1cfa959718de1599f369
