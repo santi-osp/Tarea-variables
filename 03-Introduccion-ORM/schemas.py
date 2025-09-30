@@ -51,6 +51,11 @@ class CambioContraseña(BaseModel):
     nueva_contraseña: str
 
 
+class loginResponse(BaseModel):
+    clave: str
+    nombre_usuario: UsuarioResponse
+
+
 # Modelos base para Categoría
 class CategoriaBase(BaseModel):
     nombre: str
