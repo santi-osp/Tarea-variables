@@ -14,10 +14,10 @@ export const routes: Routes = [
     path: 'categorias',
     loadComponent: () => import('./features/categoria/categoria-list/categoria-list.component').then(m => m.CategoriaListComponent)
   },
-      // {
-      //   path: 'productos',
-      //   loadComponent: () => import('./features/producto/producto-list/producto-list.component').then(m => m.ProductoListComponent)
-      // },
+  {
+    path: 'productos',
+    loadComponent: () => import('./features/producto/producto-list/producto-list.component').then(m => m.ProductoListComponent)
+  },
   {
     path: 'usuarios',
     loadComponent: () => import('./features/usuario/usuario-list/usuario-list.component').then(m => m.UsuarioListComponent)

@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, of } from 'rxjs';
+import { delay } from 'rxjs/operators';
 import { ApiResponse } from '../models/api-response.model';
 import { ApiService } from './api.service';
 
@@ -43,10 +44,43 @@ export class AuthService {
   }
 
   /**
-   * Inicia sesión del usuario
+   * Inicia sesión del usuario (FAKE - Sin conexión al backend)
    */
   login(credentials: LoginRequest): Observable<ApiResponse<LoginResponse>> {
-    return this.apiService.post<LoginResponse>('/auth/login', credentials);
+    // Simular delay de red
+    return of(this.fakeLogin(credentials)).pipe(delay(1000));
+  }
+
+  /**
+   * Login falso con credenciales hardcodeadas
+   */
+  private fakeLogin(credentials: LoginRequest): ApiResponse<LoginResponse> {
+    // Credenciales fijas: admin / admin123
+    if (credentials.email === 'admin' && credentials.password === 'admin123') {
+      const fakeUser: User = {
+        id: 1,
+        email: 'admin@itm.edu.co',
+        nombre: 'Administrador',
+        apellido: 'Sistema',
+        activo: true
+      };
+
+      const fakeResponse: LoginResponse = {
+        access_token: 'fake_token_' + Date.now(),
+        token_type: 'Bearer',
+        user: fakeUser
+      };
+
+      return {
+        success: true,
+        message: 'Login exitoso',
+        data: fakeResponse,
+        status: 200
+      };
+    } else {
+      // Simular error de credenciales
+      throw new Error('Credenciales inválidas. Usa admin / admin123');
+    }
   }
 
   /**
