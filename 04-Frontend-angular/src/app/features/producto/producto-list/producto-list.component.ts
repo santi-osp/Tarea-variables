@@ -1,86 +1,200 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { RouterModule } from '@angular/router';
-
-interface Producto {
-  id: number;
-  nombre: string;
-  descripcion: string;
-  precio: number;
-  categoria: string;
-  stock: number;
-  fechaCreacion: string;
-}
+import { FormsModule } from '@angular/forms';
+import { PaginationParams } from '../../../core/models/api-response.model';
+import { ProductoService } from '../../../core/services/producto.service';
+import { Producto, ProductoFilters } from '../../../shared/models/producto.model';
 
 @Component({
   selector: 'app-producto-list',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './producto-list.component.html',
-  styleUrls: ['./producto-list.component.scss']
+  styleUrl: './producto-list.component.scss'
 })
 export class ProductoListComponent implements OnInit {
+  productos: Producto[] = [];
+  loading = false;
+  currentPage = 1;
+  totalPages = 1;
+  pageSize = 10;
   
-  productos: Producto[] = [
-    {
+  filters: ProductoFilters = {};
+  
+  // Modal properties
+  showModal = false;
+  editingProducto: Producto | null = null;
+  productoForm = {
+    nombre: '',
+    descripcion: '',
+    precio: 0,
+    stock: 0,
+    categoria_id: 0,
+    activo: true
+  };
+
+  constructor(private productoService: ProductoService) { }
+
+  ngOnInit(): void {
+    // Agregar un dato dummy para pruebas
+    this.productos = [{
       id: 1,
       nombre: 'Laptop Dell Inspiron',
       descripcion: 'Laptop para trabajo y entretenimiento',
       precio: 2500000,
-      categoria: 'Tecnología',
       stock: 15,
-      fechaCreacion: '2025-01-15'
-    },
-    {
-      id: 2,
-      nombre: 'Mouse Inalámbrico',
-      descripcion: 'Mouse óptico inalámbrico ergonómico',
-      precio: 85000,
-      categoria: 'Accesorios',
-      stock: 50,
-      fechaCreacion: '2025-01-14'
-    },
-    {
-      id: 3,
-      nombre: 'Teclado Mecánico',
-      descripcion: 'Teclado mecánico RGB para gaming',
-      precio: 320000,
-      categoria: 'Accesorios',
-      stock: 25,
-      fechaCreacion: '2025-01-13'
-    },
-    {
-      id: 4,
-      nombre: 'Monitor 24"',
-      descripcion: 'Monitor Full HD para oficina',
-      precio: 450000,
-      categoria: 'Monitores',
-      stock: 12,
-      fechaCreacion: '2025-01-12'
-    },
-    {
-      id: 5,
-      nombre: 'Auriculares Bluetooth',
-      descripcion: 'Auriculares inalámbricos con cancelación de ruido',
-      precio: 180000,
-      categoria: 'Audio',
-      stock: 30,
-      fechaCreacion: '2025-01-11'
-    },
-    {
-      id: 6,
-      nombre: 'Tablet Samsung',
-      descripcion: 'Tablet Android para trabajo y entretenimiento',
-      precio: 1200000,
-      categoria: 'Tecnología',
-      stock: 8,
-      fechaCreacion: '2025-01-10'
+      categoria_id: 1,
+      categoria: {
+        id: 1,
+        nombre: 'Tecnología'
+      },
+      activo: true,
+      fecha_creacion: new Date().toISOString(),
+      fecha_actualizacion: new Date().toISOString()
+    }];
+    this.totalPages = 1;
+    // this.loadProductos();
+  }
+
+  loadProductos(): void {
+    this.loading = true;
+    const pagination: PaginationParams = {
+      page: this.currentPage,
+      limit: this.pageSize
+    };
+
+    this.productoService.getProductos(pagination, this.filters).subscribe({
+      next: (response) => {
+        this.productos = response.data;
+        this.totalPages = response.totalPages;
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error al cargar productos:', error);
+        this.loading = false;
+      }
+    });
+  }
+
+  onFilterChange(): void {
+    this.currentPage = 1;
+    this.loadProductos();
+  }
+
+  clearFilters(): void {
+    this.filters = {};
+    this.currentPage = 1;
+    this.loadProductos();
+  }
+
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.loadProductos();
     }
-  ];
+  }
 
-  constructor() { }
+  openCreateModal(): void {
+    this.editingProducto = null;
+    this.productoForm = {
+      nombre: '',
+      descripcion: '',
+      precio: 0,
+      stock: 0,
+      categoria_id: 0,
+      activo: true
+    };
+    this.showModal = true;
+  }
 
-  ngOnInit() {
+  editProducto(producto: Producto): void {
+    this.editingProducto = producto;
+    this.productoForm = {
+      nombre: producto.nombre,
+      descripcion: producto.descripcion || '',
+      precio: producto.precio,
+      stock: producto.stock,
+      categoria_id: producto.categoria_id,
+      activo: producto.activo
+    };
+    this.showModal = true;
+  }
+
+  closeModal(): void {
+    this.showModal = false;
+    this.editingProducto = null;
+    this.productoForm = {
+      nombre: '',
+      descripcion: '',
+      precio: 0,
+      stock: 0,
+      categoria_id: 0,
+      activo: true
+    };
+  }
+
+  saveProducto(): void {
+    if (!this.productoForm.nombre.trim() || this.productoForm.precio <= 0 || this.productoForm.stock < 0 || this.productoForm.categoria_id <= 0) {
+      alert('Nombre, precio, stock y categoría son requeridos');
+      return;
+    }
+
+    if (this.editingProducto) {
+      // Actualizar producto existente
+      const updateData = {
+        nombre: this.productoForm.nombre,
+        descripcion: this.productoForm.descripcion,
+        precio: this.productoForm.precio,
+        stock: this.productoForm.stock,
+        categoria_id: this.productoForm.categoria_id,
+        activo: this.productoForm.activo
+      };
+      
+      this.productoService.updateProducto(this.editingProducto.id, updateData).subscribe({
+        next: () => {
+          this.loadProductos();
+          this.closeModal();
+        },
+        error: (error) => {
+          console.error('Error al actualizar producto:', error);
+          alert('Error al actualizar el producto');
+        }
+      });
+    } else {
+      // Crear nuevo producto
+      const newProducto = {
+        nombre: this.productoForm.nombre,
+        descripcion: this.productoForm.descripcion,
+        precio: this.productoForm.precio,
+        stock: this.productoForm.stock,
+        categoria_id: this.productoForm.categoria_id,
+        activo: this.productoForm.activo
+      };
+      
+      this.productoService.createProducto(newProducto).subscribe({
+        next: () => {
+          this.loadProductos();
+          this.closeModal();
+        },
+        error: (error) => {
+          console.error('Error al crear producto:', error);
+          alert('Error al crear el producto');
+        }
+      });
+    }
+  }
+
+  deleteProducto(producto: Producto): void {
+    if (confirm(`¿Está seguro de eliminar el producto "${producto.nombre}"?`)) {
+      this.productoService.deleteProducto(producto.id).subscribe({
+        next: () => {
+          this.loadProductos();
+        },
+        error: (error) => {
+          console.error('Error al eliminar producto:', error);
+        }
+      });
+    }
   }
 
   formatearPrecio(precio: number): string {
@@ -89,20 +203,5 @@ export class ProductoListComponent implements OnInit {
       currency: 'COP',
       minimumFractionDigits: 0
     }).format(precio);
-  }
-
-  crearProducto() {
-    console.log('Crear nuevo producto');
-    // Aquí se implementaría la lógica para crear un nuevo producto
-  }
-
-  editarProducto(producto: Producto) {
-    console.log('Editar producto:', producto);
-    // Aquí se implementaría la lógica para editar un producto
-  }
-
-  eliminarProducto(producto: Producto) {
-    console.log('Eliminar producto:', producto);
-    // Aquí se implementaría la lógica para eliminar un producto
   }
 }
