@@ -14,7 +14,9 @@ import { NotificationService } from '../../../core/services/notification.service
       <div class="login-card slide-in-up">
         <div class="card glass">
           <div class="card-header text-center">
-            <div class="login-icon">🔐</div>
+            <div class="login-icon">
+              <i class="now-ui-icons ui-1_lock-circle-open"></i>
+            </div>
             <h2 class="card-title text-title-contrast">Iniciar Sesión</h2>
             <p class="login-subtitle text-high-contrast">Accede a tu cuenta para continuar</p>
           </div>
@@ -23,7 +25,9 @@ import { NotificationService } from '../../../core/services/notification.service
             <form (ngSubmit)="onSubmit()" #loginForm="ngForm" class="login-form">
               <div class="form-group">
                 <label for="email" class="form-label">
-                  <span class="label-icon">📧</span>
+                  <span class="label-icon">
+                    <i class="now-ui-icons users_single-02"></i>
+                  </span>
                   Usuario
                 </label>
                 <input 
@@ -44,7 +48,9 @@ import { NotificationService } from '../../../core/services/notification.service
 
               <div class="form-group">
                 <label for="password" class="form-label">
-                  <span class="label-icon">🔑</span>
+                  <span class="label-icon">
+                    <i class="now-ui-icons ui-1_lock-circle-open"></i>
+                  </span>
                   Contraseña
                 </label>
                 <input 
@@ -75,7 +81,9 @@ import { NotificationService } from '../../../core/services/notification.service
                   <span *ngIf="loading" class="spinner"></span>
                   <span *ngIf="loading">Iniciando sesión...</span>
                   <span *ngIf="!loading">
-                    <span class="btn-icon">🚀</span>
+                    <span class="btn-icon">
+                      <i class="now-ui-icons arrows-1_cloud-upload-94"></i>
+                    </span>
                     Iniciar Sesión
                   </span>
                 </button>
@@ -84,19 +92,39 @@ import { NotificationService } from '../../../core/services/notification.service
               <!-- Credenciales de prueba -->
               <div class="demo-credentials">
                 <div class="demo-header">
-                  <span class="demo-icon">🧪</span>
+                  <span class="demo-icon">
+                    <i class="now-ui-icons objects_support-17"></i>
+                  </span>
                   <strong>Credenciales de Prueba</strong>
                 </div>
                 <div class="demo-info">
-                  <p><strong>Usuario:</strong> admin</p>
-                  <p><strong>Contraseña:</strong> admin123</p>
+                  <div class="credential-group">
+                    <h4>
+                      <i class="now-ui-icons users_single-02"></i>
+                      Administrador
+                    </h4>
+                    <p><strong>Usuario:</strong> admin</p>
+                    <p><strong>Contraseña:</strong> admin123</p>
+                    <p class="role-info">Acceso completo a todas las funcionalidades</p>
+                  </div>
+                  <div class="credential-group">
+                    <h4>
+                      <i class="now-ui-icons shopping_bag-16"></i>
+                      Consumidor
+                    </h4>
+                    <p><strong>Usuario:</strong> consumidor</p>
+                    <p><strong>Contraseña:</strong> consumidor123</p>
+                    <p class="role-info">Solo puede ver productos</p>
+                  </div>
                 </div>
               </div>
 
               <div class="form-options">
                 <div class="text-center">
                   <a routerLink="/auth/forgot-password" class="link">
-                    <span class="link-icon">🔓</span>
+                    <span class="link-icon">
+                      <i class="now-ui-icons ui-1_lock-circle-open"></i>
+                    </span>
                     ¿Olvidaste tu contraseña?
                   </a>
                 </div>
@@ -104,7 +132,9 @@ import { NotificationService } from '../../../core/services/notification.service
                 <div class="text-center">
                   <span class="register-text">¿No tienes cuenta? </span>
                   <a routerLink="/auth/register" class="link">
-                    <span class="link-icon">✨</span>
+                    <span class="link-icon">
+                      <i class="now-ui-icons ui-1_simple-add"></i>
+                    </span>
                     Regístrate aquí
                   </a>
                 </div>
@@ -133,14 +163,20 @@ import { NotificationService } from '../../../core/services/notification.service
       font-size: 3rem;
       margin-bottom: 1rem;
       animation: pulse 2s infinite;
+      color: var(--primary-color);
+    }
+
+    .login-icon i {
+      font-size: 3rem;
+      color: var(--primary-color);
     }
 
     .login-subtitle {
-      color: rgba(255, 255, 255, 0.95);
+      color: #2c3e50;
       font-size: 1rem;
       margin-bottom: 0;
       font-weight: 500;
-      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
     }
 
     .login-form {
@@ -152,11 +188,17 @@ import { NotificationService } from '../../../core/services/notification.service
       align-items: center;
       gap: 0.5rem;
       font-weight: 600;
-      color: var(--dark-color);
+      color: #2c3e50;
     }
 
     .label-icon {
       font-size: 1.125rem;
+      color: var(--primary-color);
+    }
+
+    .label-icon i {
+      font-size: 1.125rem;
+      color: var(--primary-color);
     }
 
     .form-control {
@@ -196,11 +238,16 @@ import { NotificationService } from '../../../core/services/notification.service
       font-size: 1rem;
     }
 
+    .link-icon i {
+      font-size: 1rem;
+      margin-right: 0.25rem;
+    }
+
     .register-text {
-      color: rgba(255, 255, 255, 0.9);
+      color: #2c3e50;
       font-size: 0.875rem;
       font-weight: 500;
-      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
     }
 
     .btn.loading {
@@ -210,6 +257,11 @@ import { NotificationService } from '../../../core/services/notification.service
 
     .btn-icon {
       margin-right: 0.5rem;
+    }
+
+    .btn-icon i {
+      font-size: 1rem;
+      margin-right: 0.25rem;
     }
 
     .demo-credentials {
@@ -235,14 +287,53 @@ import { NotificationService } from '../../../core/services/notification.service
       font-size: 1.125rem;
     }
 
+    .demo-icon i {
+      font-size: 1.125rem;
+      color: var(--primary-color);
+    }
+
     .demo-info {
-      color: rgba(255, 255, 255, 0.9);
+      color: #2c3e50;
       font-size: 0.875rem;
       line-height: 1.5;
     }
 
     .demo-info p {
       margin: 0.25rem 0;
+    }
+
+    .credential-group {
+      margin-bottom: 1.5rem;
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .credential-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .credential-group h4 {
+      margin: 0 0 0.75rem 0;
+      color: var(--primary-color);
+      font-size: 1rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .credential-group h4 i {
+      font-size: 1rem;
+      color: var(--primary-color);
+    }
+
+    .role-info {
+      font-style: italic;
+      color: #7f8c8d;
+      font-size: 0.8rem;
+      margin-top: 0.5rem !important;
     }
 
     @keyframes pulse {

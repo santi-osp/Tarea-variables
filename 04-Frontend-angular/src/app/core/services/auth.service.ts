@@ -18,6 +18,7 @@ export interface LoginResponse {
     nombre: string;
     apellido: string;
     activo: boolean;
+    rol: string;
   };
 }
 
@@ -27,7 +28,10 @@ export interface User {
   nombre: string;
   apellido: string;
   activo: boolean;
+  rol: string;
 }
+
+export type UserRole = 'admin' | 'consumidor';
 
 @Injectable({
   providedIn: 'root'
@@ -35,6 +39,7 @@ export interface User {
 export class AuthService {
   private readonly TOKEN_KEY = 'auth_token';
   private readonly USER_KEY = 'user_data';
+  private readonly ROLE_KEY = 'user_role';
   
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
@@ -52,17 +57,27 @@ export class AuthService {
   }
 
   /**
-   * Login falso con credenciales hardcodeadas
+   * Login falso con credenciales hardcodeadas y roles
    */
   private fakeLogin(credentials: LoginRequest): ApiResponse<LoginResponse> {
-    // Credenciales fijas: admin / admin123
-    if (credentials.email === 'admin' && credentials.password === 'admin123') {
+    // Credenciales fijas con roles
+    const validCredentials = [
+      { email: 'admin', password: 'admin123', rol: 'admin' },
+      { email: 'consumidor', password: 'consumidor123', rol: 'consumidor' }
+    ];
+
+    const validCredential = validCredentials.find(
+      cred => cred.email === credentials.email && cred.password === credentials.password
+    );
+
+    if (validCredential) {
       const fakeUser: User = {
-        id: 1,
-        email: 'admin@itm.edu.co',
-        nombre: 'Administrador',
+        id: validCredential.rol === 'admin' ? 1 : 2,
+        email: validCredential.rol === 'admin' ? 'admin@itm.edu.co' : 'consumidor@itm.edu.co',
+        nombre: validCredential.rol === 'admin' ? 'Administrador' : 'Consumidor',
         apellido: 'Sistema',
-        activo: true
+        activo: true,
+        rol: validCredential.rol
       };
 
       const fakeResponse: LoginResponse = {
@@ -79,7 +94,7 @@ export class AuthService {
       };
     } else {
       // Simular error de credenciales
-      throw new Error('Credenciales inválidas. Usa admin / admin123');
+      throw new Error('Credenciales inválidas. Usa admin/admin123 o consumidor/consumidor123');
     }
   }
 
@@ -89,6 +104,7 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem(this.TOKEN_KEY);
     localStorage.removeItem(this.USER_KEY);
+    localStorage.removeItem(this.ROLE_KEY);
     this.currentUserSubject.next(null);
   }
 
@@ -119,6 +135,7 @@ export class AuthService {
   setUserData(loginResponse: LoginResponse): void {
     localStorage.setItem(this.TOKEN_KEY, loginResponse.access_token);
     localStorage.setItem(this.USER_KEY, JSON.stringify(loginResponse.user));
+    localStorage.setItem(this.ROLE_KEY, loginResponse.user.rol);
     this.currentUserSubject.next(loginResponse.user);
   }
 
@@ -136,5 +153,53 @@ export class AuthService {
         this.logout();
       }
     }
+  }
+
+  /**
+   * Obtiene el rol del usuario actual
+   */
+  getUserRole(): UserRole | null {
+    const user = this.getCurrentUser();
+    return user?.rol as UserRole || null;
+  }
+
+  /**
+   * Verifica si el usuario tiene un rol específico
+   */
+  hasRole(role: UserRole): boolean {
+    return this.getUserRole() === role;
+  }
+
+  /**
+   * Verifica si el usuario es administrador
+   */
+  isAdmin(): boolean {
+    return this.hasRole('admin');
+  }
+
+  /**
+   * Verifica si el usuario es consumidor
+   */
+  isConsumidor(): boolean {
+    return this.hasRole('consumidor');
+  }
+
+  /**
+   * Verifica si el usuario puede acceder a una ruta específica
+   */
+  canAccess(route: string): boolean {
+    const role = this.getUserRole();
+    
+    if (!role) return false;
+
+    // Admin puede acceder a todo
+    if (role === 'admin') return true;
+
+    // Consumidor solo puede acceder a productos
+    if (role === 'consumidor') {
+      return route === 'productos' || route === 'dashboard';
+    }
+
+    return false;
   }
 }

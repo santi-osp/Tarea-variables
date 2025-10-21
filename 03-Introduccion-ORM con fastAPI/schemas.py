@@ -117,8 +117,8 @@ class ProductoConCategoria(ProductoResponse):
     categoria: CategoriaResponse
 
 
-class UsuarioConProductos(UsuarioResponse):
-    productos: list[ProductoResponse] = []
+# class UsuarioConProductos(UsuarioResponse):
+#     productos: list[ProductoResponse] = []
 
 
 class CategoriaConProductos(CategoriaResponse):

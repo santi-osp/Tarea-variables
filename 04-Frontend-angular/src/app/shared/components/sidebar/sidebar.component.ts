@@ -1,21 +1,23 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
+import { AuthService } from '../../../core/services/auth.service';
 
 declare interface RouteInfo {
     path: string;
     title: string;
     icon: string;
     class: string;
+    roles?: string[];
 }
 
 export const ROUTES: RouteInfo[] = [
     { path: '/dashboard', title: 'Dashboard',  icon: 'design_app', class: '' },
-    { path: '/categorias', title: 'Categorías',  icon:'shopping_basket', class: '' },
-    { path: '/usuarios', title: 'Usuarios',  icon:'users_single-02', class: '' },
+    { path: '/categorias', title: 'Categorías',  icon:'shopping_basket', class: '', roles: ['admin'] },
+    { path: '/usuarios', title: 'Usuarios',  icon:'users_single-02', class: '', roles: ['admin'] },
     { path: '/productos', title: 'Productos',  icon:'shopping_box', class: '' },
-    { path: '/notifications', title: 'Notificaciones',  icon:'ui-1_bell-53', class: '' },
-    { path: '/upgrade', title: 'Configuración',  icon:'objects_spaceship', class: 'active active-pro' }
+    { path: '/notifications', title: 'Notificaciones',  icon:'ui-1_bell-53', class: '', roles: ['admin'] },
+    { path: '/upgrade', title: 'Configuración',  icon:'objects_spaceship', class: 'active active-pro', roles: ['admin'] }
 ];
 
 @Component({
@@ -28,10 +30,24 @@ export const ROUTES: RouteInfo[] = [
 export class SidebarComponent implements OnInit {
   menuItems: any[] = [];
 
-  constructor() { }
+  constructor(
+    public authService: AuthService,
+    private router: Router
+  ) { }
 
   ngOnInit() {
-    this.menuItems = ROUTES.filter(menuItem => menuItem);
+    this.menuItems = ROUTES.filter(menuItem => this.canAccessMenuItem(menuItem));
+  }
+
+  canAccessMenuItem(menuItem: RouteInfo): boolean {
+    // Si no tiene roles definidos, todos pueden acceder
+    if (!menuItem.roles || menuItem.roles.length === 0) {
+      return true;
+    }
+
+    // Verificar si el usuario actual tiene alguno de los roles requeridos
+    const userRole = this.authService.getUserRole();
+    return userRole ? menuItem.roles.includes(userRole) : false;
   }
   
   isMobileMenu() {
@@ -39,5 +55,10 @@ export class SidebarComponent implements OnInit {
           return false;
       }
       return true;
-  };
+  }
+
+  logout() {
+    this.authService.logout();
+    this.router.navigate(['/auth/login']);
+  }
 }
