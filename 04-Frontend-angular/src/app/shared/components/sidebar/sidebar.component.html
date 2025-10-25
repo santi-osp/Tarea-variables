@@ -25,8 +25,8 @@
                 <i class="now-ui-icons users_single-02"></i>
             </div>
             <div class="user-text">
-                <div class="user-name">{{authService.getCurrentUser()?.nombre}} {{authService.getCurrentUser()?.apellido}}</div>
-                <div class="user-role">{{authService.getCurrentUser()?.rol | titlecase}}</div>
+                <div class="user-name">{{authService.getCurrentUser()?.nombre}}</div>
+                <div class="user-role">{{authService.getCurrentUser()?.es_admin ? 'Administrador' : 'Usuario'}}</div>
             </div>
         </div>
         <button class="logout-btn" (click)="logout()" title="Cerrar Sesión">

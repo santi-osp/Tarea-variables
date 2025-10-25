@@ -1,34 +1,28 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, of } from 'rxjs';
-import { delay } from 'rxjs/operators';
-import { ApiResponse } from '../models/api-response.model';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { Usuario } from '../../shared/models/usuario.model';
 import { ApiService } from './api.service';
 
 export interface LoginRequest {
-  email: string;
-  password: string;
+  nombre_usuario: string;
+  contrasena: string;
 }
 
 export interface LoginResponse {
-  access_token: string;
-  token_type: string;
-  user: {
-    id: number;
-    email: string;
-    nombre: string;
-    apellido: string;
-    activo: boolean;
-    rol: string;
-  };
+  clave: string;
+  nombre_usuario: Usuario;
 }
 
 export interface User {
-  id: number;
+  id: string;
   email: string;
   nombre: string;
-  apellido: string;
+  nombre_usuario: string;
+  telefono?: string;
   activo: boolean;
-  rol: string;
+  es_admin: boolean;
+  fecha_creacion: string;
+  fecha_edicion?: string;
 }
 
 export type UserRole = 'admin' | 'consumidor';
@@ -49,53 +43,32 @@ export class AuthService {
   }
 
   /**
-   * Inicia sesión del usuario (FAKE - Sin conexión al backend)
+   * Inicia sesión del usuario usando el backend real
    */
-  login(credentials: LoginRequest): Observable<ApiResponse<LoginResponse>> {
-    // Simular delay de red
-    return of(this.fakeLogin(credentials)).pipe(delay(1000));
+  login(credentials: LoginRequest): Observable<LoginResponse> {
+    console.log('AuthService: Intentando login con credenciales:', credentials);
+    return this.apiService.post<LoginResponse>('/auth/login', credentials);
   }
 
   /**
-   * Login falso con credenciales hardcodeadas y roles
+   * Crea un usuario administrador inicial
    */
-  private fakeLogin(credentials: LoginRequest): ApiResponse<LoginResponse> {
-    // Credenciales fijas con roles
-    const validCredentials = [
-      { email: 'admin', password: 'admin123', rol: 'admin' },
-      { email: 'consumidor', password: 'consumidor123', rol: 'consumidor' }
-    ];
+  crearAdmin(): Observable<any> {
+    return this.apiService.post('/auth/crear-admin', {});
+  }
 
-    const validCredential = validCredentials.find(
-      cred => cred.email === credentials.email && cred.password === credentials.password
-    );
+  /**
+   * Verifica el estado de autenticación
+   */
+  verificarEstado(): Observable<any> {
+    return this.apiService.get('/auth/estado');
+  }
 
-    if (validCredential) {
-      const fakeUser: User = {
-        id: validCredential.rol === 'admin' ? 1 : 2,
-        email: validCredential.rol === 'admin' ? 'admin@itm.edu.co' : 'consumidor@itm.edu.co',
-        nombre: validCredential.rol === 'admin' ? 'Administrador' : 'Consumidor',
-        apellido: 'Sistema',
-        activo: true,
-        rol: validCredential.rol
-      };
-
-      const fakeResponse: LoginResponse = {
-        access_token: 'fake_token_' + Date.now(),
-        token_type: 'Bearer',
-        user: fakeUser
-      };
-
-      return {
-        success: true,
-        message: 'Login exitoso',
-        data: fakeResponse,
-        status: 200
-      };
-    } else {
-      // Simular error de credenciales
-      throw new Error('Credenciales inválidas. Usa admin/admin123 o consumidor/consumidor123');
-    }
+  /**
+   * Verifica un usuario por ID
+   */
+  verificarUsuario(usuarioId: string): Observable<Usuario> {
+    return this.apiService.get<Usuario>(`/auth/verificar/${usuarioId}`);
   }
 
   /**
@@ -133,10 +106,14 @@ export class AuthService {
    * Guarda los datos del usuario después del login
    */
   setUserData(loginResponse: LoginResponse): void {
-    localStorage.setItem(this.TOKEN_KEY, loginResponse.access_token);
-    localStorage.setItem(this.USER_KEY, JSON.stringify(loginResponse.user));
-    localStorage.setItem(this.ROLE_KEY, loginResponse.user.rol);
-    this.currentUserSubject.next(loginResponse.user);
+    console.log('AuthService: Guardando datos del usuario:', loginResponse);
+    localStorage.setItem(this.TOKEN_KEY, loginResponse.clave);
+    localStorage.setItem(this.USER_KEY, JSON.stringify(loginResponse.nombre_usuario));
+    localStorage.setItem(this.ROLE_KEY, loginResponse.nombre_usuario.es_admin ? 'admin' : 'consumidor');
+    this.currentUserSubject.next(loginResponse.nombre_usuario);
+    console.log('AuthService: Datos guardados en localStorage');
+    console.log('Token:', localStorage.getItem(this.TOKEN_KEY));
+    console.log('Usuario:', localStorage.getItem(this.USER_KEY));
   }
 
   /**
@@ -160,7 +137,7 @@ export class AuthService {
    */
   getUserRole(): UserRole | null {
     const user = this.getCurrentUser();
-    return user?.rol as UserRole || null;
+    return user?.es_admin ? 'admin' : 'consumidor';
   }
 
   /**
@@ -174,14 +151,16 @@ export class AuthService {
    * Verifica si el usuario es administrador
    */
   isAdmin(): boolean {
-    return this.hasRole('admin');
+    const user = this.getCurrentUser();
+    return user?.es_admin || false;
   }
 
   /**
    * Verifica si el usuario es consumidor
    */
   isConsumidor(): boolean {
-    return this.hasRole('consumidor');
+    const user = this.getCurrentUser();
+    return !user?.es_admin;
   }
 
   /**

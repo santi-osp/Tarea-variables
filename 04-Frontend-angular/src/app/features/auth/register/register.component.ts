@@ -295,8 +295,12 @@ export class RegisterComponent implements OnInit {
   registerData: CreateUsuarioRequest = {
     email: '',
     password: '',
+    contraseña: '',
     nombre: '',
-    apellido: ''
+    apellido: '',
+    nombre_usuario: '',
+    telefono: '',
+    es_admin: false
   };
   
   loading = false;

@@ -33,17 +33,7 @@ export class CategoriaListComponent implements OnInit {
   constructor(private categoriaService: CategoriaService) { }
 
   ngOnInit(): void {
-    // Agregar un dato dummy para pruebas
-    this.categorias = [{
-      id: 1,
-      nombre: 'Tecnología',
-      descripcion: 'Categoría para productos tecnológicos',
-      activa: true,
-      fecha_creacion: new Date().toISOString(),
-      fecha_actualizacion: new Date().toISOString()
-    }];
-    this.totalPages = 1;
-    // this.loadCategorias();
+    this.loadCategorias();
   }
 
   loadCategorias(): void {
@@ -54,13 +44,28 @@ export class CategoriaListComponent implements OnInit {
     };
 
     this.categoriaService.getCategorias(pagination, this.filters).subscribe({
-      next: (response) => {
-        this.categorias = response.data;
-        this.totalPages = response.totalPages;
+      next: (categorias) => {
+        this.categorias = categorias;
+        // Since backend doesn't provide pagination info, we'll set a default
+        this.totalPages = Math.ceil(categorias.length / this.pageSize);
         this.loading = false;
       },
       error: (error) => {
         console.error('Error al cargar categorías:', error);
+        // Si el backend no está disponible, usar datos mock
+        if (error.status === 0 || error.status === undefined) {
+          console.log('Backend no disponible, usando datos mock para categorías');
+          this.categorias = [{
+            id_categoria: '1',
+            id: '1',
+            nombre: 'Tecnología',
+            descripcion: 'Categoría para productos tecnológicos',
+            activa: true,
+            fecha_creacion: new Date().toISOString(),
+            fecha_edicion: new Date().toISOString()
+          }];
+          this.totalPages = 1;
+        }
         this.loading = false;
       }
     });

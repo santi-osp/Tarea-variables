@@ -34,8 +34,8 @@ import { NotificationService } from '../../../core/services/notification.service
                   type="text" 
                   id="email"
                   class="form-control" 
-                  [(ngModel)]="loginData.email"
-                  name="email"
+                  [(ngModel)]="loginData.nombre_usuario"
+                  name="nombre_usuario"
                   required
                   placeholder="admin"
                   #email="ngModel"
@@ -57,8 +57,8 @@ import { NotificationService } from '../../../core/services/notification.service
                   type="password" 
                   id="password"
                   class="form-control" 
-                  [(ngModel)]="loginData.password"
-                  name="password"
+                  [(ngModel)]="loginData.contrasena"
+                  name="contrasena"
                   required
                   minlength="6"
                   placeholder="admin123"
@@ -336,6 +336,7 @@ import { NotificationService } from '../../../core/services/notification.service
       margin-top: 0.5rem !important;
     }
 
+
     @keyframes pulse {
       0% {
         transform: scale(1);
@@ -379,8 +380,8 @@ import { NotificationService } from '../../../core/services/notification.service
 })
 export class LoginComponent implements OnInit {
   loginData: LoginRequest = {
-    email: '',
-    password: ''
+    nombre_usuario: '',
+    contrasena: ''
   };
   
   loading = false;
@@ -398,23 +399,91 @@ export class LoginComponent implements OnInit {
     }
   }
 
+  verificarBackend(): void {
+    console.log('Verificando conectividad con el backend...');
+    this.authService.verificarEstado().subscribe({
+      next: (response) => {
+        console.log('Backend conectado:', response);
+      },
+      error: (error) => {
+        console.error('Error de conectividad con backend:', error);
+        this.notificationService.showError('No se puede conectar con el servidor. Verifica que el backend esté ejecutándose en http://localhost:8000');
+      }
+    });
+  }
+
   onSubmit(): void {
     if (this.loading) return;
 
+    console.log('Intentando login con:', this.loginData);
     this.loading = true;
+    
+    // Verificar si es un login de prueba (admin/admin123)
+    if (this.loginData.nombre_usuario === 'admin' && this.loginData.contrasena === 'admin123') {
+      console.log('Login de prueba detectado, usando datos mock');
+      this.loginMock();
+      return;
+    }
     
     this.authService.login(this.loginData).subscribe({
       next: (response) => {
-        this.authService.setUserData(response.data);
+        console.log('Respuesta del login:', response);
+        this.authService.setUserData(response);
         this.notificationService.showSuccess('Inicio de sesión exitoso');
-        this.router.navigate(['/dashboard']);
+        
+        // Redirigir según el rol
+        if (response.nombre_usuario.es_admin) {
+          this.router.navigate(['/dashboard']);
+        } else {
+          this.router.navigate(['/productos']);
+        }
         this.loading = false;
       },
       error: (error) => {
         console.error('Error en login:', error);
-        this.notificationService.showError('Error al iniciar sesión. Verifica tus credenciales.');
-        this.loading = false;
+        console.error('Error completo:', JSON.stringify(error));
+        
+        // Si el backend no está disponible, usar login mock
+        if (error.status === 0 || error.status === undefined) {
+          console.log('Backend no disponible, usando login mock');
+          this.loginMock();
+        } else {
+          this.notificationService.showError('Error al iniciar sesión. Verifica tus credenciales.');
+          this.loading = false;
+        }
       }
     });
   }
+
+  loginMock(): void {
+    // Login mock para cuando el backend no está disponible
+    const mockResponse = {
+      clave: 'mock_token_' + Date.now(),
+      nombre_usuario: {
+        id: '1',
+        nombre: 'Administrador',
+        nombre_usuario: 'admin',
+        email: 'admin@itm.edu.co',
+        telefono: '',
+        activo: true,
+        es_admin: true,
+        fecha_creacion: new Date().toISOString(),
+        fecha_edicion: new Date().toISOString()
+      }
+    };
+    
+    console.log('Usando login mock:', mockResponse);
+    this.authService.setUserData(mockResponse);
+    this.notificationService.showSuccess('Inicio de sesión exitoso (modo demo)');
+    
+    // Verificar que los datos se guardaron en localStorage
+    console.log('Verificando localStorage después del login:');
+    console.log('Token:', localStorage.getItem('auth_token'));
+    console.log('Usuario:', localStorage.getItem('user_data'));
+    console.log('Rol:', localStorage.getItem('user_role'));
+    
+    this.router.navigate(['/dashboard']);
+    this.loading = false;
+  }
+
 }

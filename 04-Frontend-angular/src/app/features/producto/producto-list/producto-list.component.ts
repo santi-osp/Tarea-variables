@@ -29,31 +29,15 @@ export class ProductoListComponent implements OnInit {
     descripcion: '',
     precio: 0,
     stock: 0,
-    categoria_id: 0,
+    categoria_id: '',
+    usuario_id: '',
     activo: true
   };
 
   constructor(private productoService: ProductoService) { }
 
   ngOnInit(): void {
-    // Agregar un dato dummy para pruebas
-    this.productos = [{
-      id: 1,
-      nombre: 'Laptop Dell Inspiron',
-      descripcion: 'Laptop para trabajo y entretenimiento',
-      precio: 2500000,
-      stock: 15,
-      categoria_id: 1,
-      categoria: {
-        id: 1,
-        nombre: 'Tecnología'
-      },
-      activo: true,
-      fecha_creacion: new Date().toISOString(),
-      fecha_actualizacion: new Date().toISOString()
-    }];
-    this.totalPages = 1;
-    // this.loadProductos();
+    this.loadProductos();
   }
 
   loadProductos(): void {
@@ -64,13 +48,35 @@ export class ProductoListComponent implements OnInit {
     };
 
     this.productoService.getProductos(pagination, this.filters).subscribe({
-      next: (response) => {
-        this.productos = response.data;
-        this.totalPages = response.totalPages;
+      next: (productos) => {
+        this.productos = productos;
+        // Since backend doesn't provide pagination info, we'll set a default
+        this.totalPages = Math.ceil(productos.length / this.pageSize);
         this.loading = false;
       },
       error: (error) => {
         console.error('Error al cargar productos:', error);
+        // Si el backend no está disponible, usar datos mock
+        if (error.status === 0 || error.status === undefined) {
+          console.log('Backend no disponible, usando datos mock para productos');
+          this.productos = [{
+            id_producto: '1',
+            id: '1',
+            nombre: 'Laptop Dell Inspiron',
+            descripcion: 'Laptop para trabajo y entretenimiento',
+            precio: 2500000,
+            stock: 15,
+            categoria_id: '1',
+            usuario_id: '1',
+            activo: true,
+            categoria: {
+              nombre: 'Tecnología'
+            },
+            fecha_creacion: new Date().toISOString(),
+            fecha_edicion: new Date().toISOString()
+          }];
+          this.totalPages = 1;
+        }
         this.loading = false;
       }
     });
@@ -101,7 +107,8 @@ export class ProductoListComponent implements OnInit {
       descripcion: '',
       precio: 0,
       stock: 0,
-      categoria_id: 0,
+      categoria_id: '',
+      usuario_id: '',
       activo: true
     };
     this.showModal = true;
@@ -115,6 +122,7 @@ export class ProductoListComponent implements OnInit {
       precio: producto.precio,
       stock: producto.stock,
       categoria_id: producto.categoria_id,
+      usuario_id: producto.usuario_id,
       activo: producto.activo
     };
     this.showModal = true;
@@ -128,14 +136,15 @@ export class ProductoListComponent implements OnInit {
       descripcion: '',
       precio: 0,
       stock: 0,
-      categoria_id: 0,
+      categoria_id: '',
+      usuario_id: '',
       activo: true
     };
   }
 
   saveProducto(): void {
-    if (!this.productoForm.nombre.trim() || this.productoForm.precio <= 0 || this.productoForm.stock < 0 || this.productoForm.categoria_id <= 0) {
-      alert('Nombre, precio, stock y categoría son requeridos');
+    if (!this.productoForm.nombre.trim() || this.productoForm.precio <= 0 || this.productoForm.stock < 0 || !this.productoForm.categoria_id || !this.productoForm.usuario_id) {
+      alert('Nombre, precio, stock, categoría y usuario son requeridos');
       return;
     }
 
@@ -147,6 +156,7 @@ export class ProductoListComponent implements OnInit {
         precio: this.productoForm.precio,
         stock: this.productoForm.stock,
         categoria_id: this.productoForm.categoria_id,
+        usuario_id: this.productoForm.usuario_id,
         activo: this.productoForm.activo
       };
       
@@ -168,6 +178,7 @@ export class ProductoListComponent implements OnInit {
         precio: this.productoForm.precio,
         stock: this.productoForm.stock,
         categoria_id: this.productoForm.categoria_id,
+        usuario_id: this.productoForm.usuario_id,
         activo: this.productoForm.activo
       };
       
