@@ -1,161 +1,16 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { PaginationParams } from '../../../core/models/api-response.model';
 import { UsuarioService } from '../../../core/services/usuario.service';
-import { Usuario, UsuarioFilters } from '../../../shared/models/usuario.model';
+import { CreateUsuarioRequest, UpdateUsuarioRequest, Usuario, UsuarioFilters } from '../../../shared/models/usuario.model';
 
 @Component({
   selector: 'app-usuario-list',
   standalone: true,
-  imports: [CommonModule, FormsModule],
-  template: `
-    <div class="usuario-list">
-      <div class="card">
-        <div class="card-header">
-          <h2 class="card-title">Gestión de Usuarios</h2>
-          <button class="btn btn-success" (click)="openCreateModal()">
-            Nuevo Usuario
-          </button>
-        </div>
-        
-        <div class="card-body">
-          <!-- Filtros -->
-          <div class="filters mb-3">
-            <div class="row">
-              <div class="col-md-3">
-                <input 
-                  type="text" 
-                  class="form-control" 
-                  placeholder="Buscar por email..."
-                  [(ngModel)]="filters.email"
-                  (input)="onFilterChange()"
-                >
-              </div>
-              <div class="col-md-3">
-                <input 
-                  type="text" 
-                  class="form-control" 
-                  placeholder="Buscar por nombre..."
-                  [(ngModel)]="filters.nombre"
-                  (input)="onFilterChange()"
-                >
-              </div>
-              <div class="col-md-2">
-                <select 
-                  class="form-control" 
-                  [(ngModel)]="filters.activo"
-                  (change)="onFilterChange()"
-                >
-                  <option value="">Todos los estados</option>
-                  <option value="true">Activos</option>
-                  <option value="false">Inactivos</option>
-                </select>
-              </div>
-              <div class="col-md-2">
-                <button class="btn btn-secondary" (click)="clearFilters()">
-                  Limpiar
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Tabla de usuarios -->
-          <div class="table-responsive">
-            <table class="table">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Email</th>
-                  <th>Nombre</th>
-                  <th>Apellido</th>
-                  <th>Estado</th>
-                  <th>Último Acceso</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngIf="loading">
-                  <td colspan="7" class="text-center">Cargando...</td>
-                </tr>
-                <tr *ngIf="!loading && usuarios.length === 0">
-                  <td colspan="7" class="text-center">No hay usuarios disponibles</td>
-                </tr>
-                <tr *ngFor="let usuario of usuarios">
-                  <td>{{ usuario.id }}</td>
-                  <td>{{ usuario.email }}</td>
-                  <td>{{ usuario.nombre }}</td>
-                  <td>{{ usuario.apellido }}</td>
-                  <td>
-                    <span class="badge" [class.badge-success]="usuario.activo" [class.badge-danger]="!usuario.activo">
-                      {{ usuario.activo ? 'Activo' : 'Inactivo' }}
-                    </span>
-                  </td>
-                  <td>{{ usuario.ultimo_acceso | date:'short' || '-' }}</td>
-                  <td>
-                    <button class="btn btn-sm btn-primary" (click)="editUsuario(usuario)">
-                      Editar
-                    </button>
-                    <button class="btn btn-sm btn-danger" (click)="deleteUsuario(usuario)">
-                      Eliminar
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <!-- Paginación -->
-          <div class="pagination mt-3" *ngIf="totalPages > 1">
-            <button 
-              class="btn btn-secondary" 
-              [disabled]="currentPage === 1"
-              (click)="goToPage(currentPage - 1)"
-            >
-              Anterior
-            </button>
-            <span class="mx-3">
-              Página {{ currentPage }} de {{ totalPages }}
-            </span>
-            <button 
-              class="btn btn-secondary" 
-              [disabled]="currentPage === totalPages"
-              (click)="goToPage(currentPage + 1)"
-            >
-              Siguiente
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  `,
-  styles: [`
-    .badge {
-      padding: 0.25rem 0.5rem;
-      border-radius: 0.25rem;
-      font-size: 0.75rem;
-    }
-    
-    .badge-success {
-      background-color: #28a745;
-      color: white;
-    }
-    
-    .badge-danger {
-      background-color: #dc3545;
-      color: white;
-    }
-    
-    .table-responsive {
-      overflow-x: auto;
-    }
-    
-    .pagination {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-  `]
+  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  templateUrl: './usuario-list.component.html',
+  styleUrl: './usuario-list.component.scss'
 })
 export class UsuarioListComponent implements OnInit {
   usuarios: Usuario[] = [];
@@ -165,8 +20,25 @@ export class UsuarioListComponent implements OnInit {
   pageSize = 10;
   
   filters: UsuarioFilters = {};
+  
+  // Modal properties
+  showModal = false;
+  editingUsuario: Usuario | null = null;
+  usuarioForm: FormGroup;
 
-  constructor(private usuarioService: UsuarioService) { }
+  constructor(
+    private usuarioService: UsuarioService,
+    private fb: FormBuilder
+  ) {
+    this.usuarioForm = this.fb.group({
+      nombre: ['', [Validators.required, Validators.minLength(2)]],
+      nombre_usuario: ['', [Validators.required, Validators.minLength(3)]],
+      email: ['', [Validators.required, Validators.email]],
+      telefono: [''],
+      contraseña: [''],
+      es_admin: [false]
+    });
+  }
 
   ngOnInit(): void {
     this.loadUsuarios();
@@ -180,13 +52,28 @@ export class UsuarioListComponent implements OnInit {
     };
 
     this.usuarioService.getUsuarios(pagination, this.filters).subscribe({
-      next: (response) => {
-        this.usuarios = response.data;
-        this.totalPages = response.totalPages;
+      next: (usuarios) => {
+        this.usuarios = usuarios;
         this.loading = false;
       },
       error: (error) => {
         console.error('Error al cargar usuarios:', error);
+        // Si el backend no está disponible, usar datos mock
+        if (error.status === 0 || error.status === undefined) {
+          console.log('Backend no disponible, usando datos mock para usuarios');
+          this.usuarios = [{
+            id: '1',
+            nombre: 'Administrador',
+            nombre_usuario: 'admin',
+            email: 'admin@itm.edu.co',
+            telefono: '',
+            activo: true,
+            es_admin: true,
+            fecha_creacion: new Date().toISOString(),
+            fecha_edicion: new Date().toISOString()
+          }];
+          this.totalPages = 1;
+        }
         this.loading = false;
       }
     });
@@ -211,13 +98,94 @@ export class UsuarioListComponent implements OnInit {
   }
 
   openCreateModal(): void {
-    // TODO: Implementar modal para crear usuario
-    console.log('Abrir modal de creación');
+    this.editingUsuario = null;
+    this.usuarioForm.reset({
+      nombre: '',
+      nombre_usuario: '',
+      email: '',
+      telefono: '',
+      contraseña: '',
+      es_admin: false
+    });
+    this.showModal = true;
   }
 
   editUsuario(usuario: Usuario): void {
-    // TODO: Implementar modal para editar usuario
-    console.log('Editar usuario:', usuario);
+    this.editingUsuario = usuario;
+    this.usuarioForm.patchValue({
+      nombre: usuario.nombre,
+      nombre_usuario: usuario.nombre_usuario,
+      email: usuario.email,
+      telefono: usuario.telefono || '',
+      contraseña: '',
+      es_admin: usuario.es_admin
+    });
+    this.showModal = true;
+  }
+
+  closeModal(): void {
+    this.showModal = false;
+    this.editingUsuario = null;
+    this.usuarioForm.reset();
+  }
+
+  saveUsuario(): void {
+    if (this.usuarioForm.invalid) {
+      this.usuarioForm.markAllAsTouched();
+      return;
+    }
+
+    if (!this.editingUsuario && !this.usuarioForm.get('contraseña')?.value) {
+      alert('La contraseña es requerida para nuevos usuarios');
+      return;
+    }
+
+    const formValue = this.usuarioForm.value;
+
+    if (this.editingUsuario) {
+      // Actualizar usuario existente
+      const updateData: UpdateUsuarioRequest = {
+        nombre: formValue.nombre,
+        nombre_usuario: formValue.nombre_usuario,
+        email: formValue.email,
+        telefono: formValue.telefono,
+        es_admin: formValue.es_admin
+      };
+      
+      this.usuarioService.updateUsuario(this.editingUsuario.id, updateData).subscribe({
+        next: () => {
+          this.loadUsuarios();
+          this.closeModal();
+        },
+        error: (error) => {
+          console.error('Error al actualizar usuario:', error);
+          alert('Error al actualizar el usuario');
+        }
+      });
+    } else {
+      // Crear nuevo usuario
+      const newUsuario: CreateUsuarioRequest = {
+        nombre: formValue.nombre,
+        nombre_usuario: formValue.nombre_usuario,
+        email: formValue.email,
+        telefono: formValue.telefono,
+        contraseña: formValue.contraseña,
+        password: formValue.contraseña, // Alias for frontend compatibility
+        apellido: formValue.apellido || '', // Add missing field
+        es_admin: formValue.es_admin
+      };
+      
+      this.usuarioService.createUsuario(newUsuario).subscribe({
+        next: () => {
+          this.loadUsuarios();
+          this.closeModal();
+        },
+        error: (error) => {
+          console.error('Error al crear usuario:', error);
+          alert('Error al crear el usuario');
+        }
+      });
+    }
   }
 
   deleteUsuario(usuario: Usuario): void {
@@ -228,6 +196,21 @@ export class UsuarioListComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error al eliminar usuario:', error);
+          alert('Error al eliminar el usuario');
+        }
+      });
+    }
+  }
+
+  desactivarUsuario(usuario: Usuario): void {
+    if (confirm(`¿Está seguro de desactivar el usuario "${usuario.email}"?`)) {
+      this.usuarioService.desactivarUsuario(usuario.id).subscribe({
+        next: () => {
+          this.loadUsuarios();
+        },
+        error: (error) => {
+          console.error('Error al desactivar usuario:', error);
+          alert('Error al desactivar el usuario');
         }
       });
     }

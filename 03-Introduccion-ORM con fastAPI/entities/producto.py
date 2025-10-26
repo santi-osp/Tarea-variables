@@ -1,11 +1,10 @@
 import uuid
 
+from database.config import Base
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, Numeric, String, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-
-from database.config import Base
 
 
 class Producto(Base):
@@ -27,30 +26,28 @@ class Producto(Base):
         UUID(as_uuid=True), ForeignKey("categorias.id_categoria"), nullable=False
     )
     usuario_id = Column(
-        UUID(as_uuid=True), ForeignKey("usuarios.id_usuario"), nullable=False
+        UUID(as_uuid=True), ForeignKey("tbl_usuarios.id"), nullable=False
     )
 
     id_usuario_crea = Column(
-        UUID(as_uuid=True), ForeignKey("usuarios.id_usuario"), nullable=False
+        UUID(as_uuid=True), ForeignKey("tbl_usuarios.id"), nullable=False
     )
     id_usuario_edita = Column(
-        UUID(as_uuid=True), ForeignKey("usuarios.id_usuario"), nullable=True
+        UUID(as_uuid=True), ForeignKey("tbl_usuarios.id"), nullable=True
     )
 
     categoria = relationship("Categoria", back_populates="productos")
-    usuario = relationship(
-        "Usuario", back_populates="productos", foreign_keys=[usuario_id]
-    )
+    # usuario = relationship(
+    #     "Usuario", back_populates="productos", foreign_keys=[usuario_id]
+    # )
 
     usuario_crea = relationship(
         "Usuario",
         foreign_keys=[id_usuario_crea],
-        overlaps="usuario,usuario_edita,productos",
     )
     usuario_edita = relationship(
         "Usuario",
         foreign_keys=[id_usuario_edita],
-        overlaps="usuario,usuario_crea,productos",
     )
 
     def __repr__(self):

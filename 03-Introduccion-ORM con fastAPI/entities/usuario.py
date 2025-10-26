@@ -1,11 +1,10 @@
 import uuid
 
+from database.config import Base
 from sqlalchemy import Boolean, Column, DateTime, String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-
-from database.config import Base
 
 
 class Usuario(Base):
@@ -22,9 +21,9 @@ class Usuario(Base):
     fecha_creacion = Column(DateTime(timezone=True), server_default=func.now())
     fecha_edicion = Column(DateTime(timezone=True), onupdate=func.now())
 
-    productos = relationship(
-        "Producto", back_populates="usuario", foreign_keys="Producto.usuario_id"
-    )
+    # productos = relationship(
+    #     "Producto", back_populates="usuario", foreign_keys="Producto.usuario_id"
+    # )
 
     def __repr__(self):
         return f"<Usuario(id={self.id}, nombre='{self.nombre}', email='{self.email}')>"

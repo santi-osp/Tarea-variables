@@ -12,16 +12,21 @@ import { CreateUsuarioRequest } from '../../../shared/models/usuario.model';
   imports: [CommonModule, FormsModule],
   template: `
     <div class="register-container">
-      <div class="register-card">
-        <div class="card">
+      <div class="register-card slide-in-up">
+        <div class="card glass">
           <div class="card-header text-center">
-            <h2 class="card-title">Registrarse</h2>
+            <div class="register-icon">✨</div>
+            <h2 class="card-title text-title-contrast">Crear Cuenta</h2>
+            <p class="register-subtitle text-high-contrast">Únete a nuestro sistema</p>
           </div>
           
           <div class="card-body">
             <form (ngSubmit)="onSubmit()" #registerForm="ngForm">
               <div class="form-group">
-                <label for="email" class="form-label">Email</label>
+                <label for="email" class="form-label">
+                  <span class="label-icon">📧</span>
+                  Email
+                </label>
                 <input 
                   type="email" 
                   id="email"
@@ -30,6 +35,7 @@ import { CreateUsuarioRequest } from '../../../shared/models/usuario.model';
                   name="email"
                   required
                   email
+                  placeholder="tu@email.com"
                   #email="ngModel"
                   [class.is-invalid]="email.invalid && email.touched"
                 >
@@ -40,7 +46,10 @@ import { CreateUsuarioRequest } from '../../../shared/models/usuario.model';
               </div>
 
               <div class="form-group">
-                <label for="password" class="form-label">Contraseña</label>
+                <label for="password" class="form-label">
+                  <span class="label-icon">🔑</span>
+                  Contraseña
+                </label>
                 <input 
                   type="password" 
                   id="password"
@@ -49,6 +58,7 @@ import { CreateUsuarioRequest } from '../../../shared/models/usuario.model';
                   name="password"
                   required
                   minlength="6"
+                  placeholder="••••••••"
                   #password="ngModel"
                   [class.is-invalid]="password.invalid && password.touched"
                 >
@@ -59,7 +69,10 @@ import { CreateUsuarioRequest } from '../../../shared/models/usuario.model';
               </div>
 
               <div class="form-group">
-                <label for="nombre" class="form-label">Nombre</label>
+                <label for="nombre" class="form-label">
+                  <span class="label-icon">👤</span>
+                  Nombre
+                </label>
                 <input 
                   type="text" 
                   id="nombre"
@@ -68,6 +81,7 @@ import { CreateUsuarioRequest } from '../../../shared/models/usuario.model';
                   name="nombre"
                   required
                   minlength="2"
+                  placeholder="Tu nombre"
                   #nombre="ngModel"
                   [class.is-invalid]="nombre.invalid && nombre.touched"
                 >
@@ -78,7 +92,10 @@ import { CreateUsuarioRequest } from '../../../shared/models/usuario.model';
               </div>
 
               <div class="form-group">
-                <label for="apellido" class="form-label">Apellido</label>
+                <label for="apellido" class="form-label">
+                  <span class="label-icon">👥</span>
+                  Apellido
+                </label>
                 <input 
                   type="text" 
                   id="apellido"
@@ -87,6 +104,7 @@ import { CreateUsuarioRequest } from '../../../shared/models/usuario.model';
                   name="apellido"
                   required
                   minlength="2"
+                  placeholder="Tu apellido"
                   #apellido="ngModel"
                   [class.is-invalid]="apellido.invalid && apellido.touched"
                 >
@@ -99,19 +117,27 @@ import { CreateUsuarioRequest } from '../../../shared/models/usuario.model';
               <div class="form-group">
                 <button 
                   type="submit" 
-                  class="btn btn-primary w-100"
+                  class="btn btn-primary w-100 btn-lg"
                   [disabled]="registerForm.invalid || loading"
+                  [class.loading]="loading"
                 >
+                  <span *ngIf="loading" class="spinner"></span>
                   <span *ngIf="loading">Registrando...</span>
-                  <span *ngIf="!loading">Registrarse</span>
+                  <span *ngIf="!loading">
+                    <span class="btn-icon">✨</span>
+                    Crear Cuenta
+                  </span>
                 </button>
               </div>
 
-              <div class="text-center mt-3">
-                <span>¿Ya tienes cuenta? </span>
-                <a routerLink="/auth/login" class="text-decoration-none">
-                  Inicia sesión aquí
-                </a>
+              <div class="form-options">
+                <div class="text-center">
+                  <span class="login-text">¿Ya tienes cuenta? </span>
+                  <a routerLink="/auth/login" class="link">
+                    <span class="link-icon">🔐</span>
+                    Inicia sesión aquí
+                  </a>
+                </div>
               </div>
             </form>
           </div>
@@ -125,26 +151,93 @@ import { CreateUsuarioRequest } from '../../../shared/models/usuario.model';
       justify-content: center;
       align-items: center;
       min-height: 80vh;
-      padding: 20px;
+      padding: 2rem;
     }
     
     .register-card {
       width: 100%;
-      max-width: 400px;
+      max-width: 500px;
     }
-    
-    .w-100 {
-      width: 100%;
+
+    .register-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      animation: pulse 2s infinite;
     }
-    
-    .text-decoration-none {
+
+    .register-subtitle {
+      color: rgba(255, 255, 255, 0.95);
+      font-size: 1rem;
+      margin-bottom: 0;
+      font-weight: 500;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    .form-label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+      color: var(--dark-color);
+    }
+
+    .label-icon {
+      font-size: 1.125rem;
+    }
+
+    .form-control {
+      margin-top: 0.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(59, 130, 246, 0.15);
+    }
+
+    .form-options {
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--primary-color);
       text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      padding: 0.5rem;
+      border-radius: var(--radius-sm);
     }
-    
-    .text-decoration-none:hover {
-      text-decoration: underline;
+
+    .link:hover {
+      background: rgba(59, 130, 246, 0.1);
+      transform: translateY(-1px);
     }
-    
+
+    .link-icon {
+      font-size: 1rem;
+    }
+
+    .login-text {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 0.875rem;
+      font-weight: 500;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    .btn.loading {
+      opacity: 0.8;
+      cursor: not-allowed;
+    }
+
+    .btn-icon {
+      margin-right: 0.5rem;
+    }
+
     .is-invalid {
       border-color: #dc3545;
     }
@@ -156,14 +249,58 @@ import { CreateUsuarioRequest } from '../../../shared/models/usuario.model';
       font-size: 0.875rem;
       color: #dc3545;
     }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.05);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .register-container {
+        padding: 1rem;
+      }
+
+      .register-card {
+        max-width: 100%;
+      }
+
+      .register-icon {
+        font-size: 2.5rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .register-container {
+        padding: 0.5rem;
+      }
+
+      .form-label {
+        font-size: 0.875rem;
+      }
+
+      .link {
+        font-size: 0.875rem;
+      }
+    }
   `]
 })
 export class RegisterComponent implements OnInit {
   registerData: CreateUsuarioRequest = {
     email: '',
     password: '',
+    contraseña: '',
     nombre: '',
-    apellido: ''
+    apellido: '',
+    nombre_usuario: '',
+    telefono: '',
+    es_admin: false
   };
   
   loading = false;

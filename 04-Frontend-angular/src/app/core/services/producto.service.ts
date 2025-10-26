@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { CreateProductoRequest, Producto, ProductoFilters, UpdateProductoRequest } from '../../shared/models/producto.model';
-import { ApiResponse, PaginatedResponse, PaginationParams } from '../models/api-response.model';
+import { PaginationParams } from '../models/api-response.model';
 import { ApiService } from './api.service';
 
 @Injectable({
@@ -15,49 +15,63 @@ export class ProductoService {
   /**
    * Obtiene todos los productos con paginación
    */
-  getProductos(pagination: PaginationParams, filters?: ProductoFilters): Observable<PaginatedResponse<Producto>> {
+  getProductos(pagination: PaginationParams, filters?: ProductoFilters): Observable<Producto[]> {
     return this.apiService.getPaginated<Producto>(this.endpoint, pagination, filters);
   }
 
   /**
    * Obtiene un producto por ID
    */
-  getProductoById(id: number): Observable<ApiResponse<Producto>> {
+  getProductoById(id: string): Observable<Producto> {
     return this.apiService.get<Producto>(`${this.endpoint}/${id}`);
   }
 
   /**
    * Crea un nuevo producto
    */
-  createProducto(producto: CreateProductoRequest): Observable<ApiResponse<Producto>> {
+  createProducto(producto: CreateProductoRequest): Observable<Producto> {
     return this.apiService.post<Producto>(this.endpoint, producto);
   }
 
   /**
    * Actualiza un producto existente
    */
-  updateProducto(id: number, producto: UpdateProductoRequest): Observable<ApiResponse<Producto>> {
+  updateProducto(id: string, producto: UpdateProductoRequest): Observable<Producto> {
     return this.apiService.put<Producto>(`${this.endpoint}/${id}`, producto);
   }
 
   /**
    * Elimina un producto
    */
-  deleteProducto(id: number): Observable<ApiResponse<void>> {
-    return this.apiService.delete<void>(`${this.endpoint}/${id}`);
-  }
-
-  /**
-   * Obtiene todos los productos activos (sin paginación)
-   */
-  getProductosActivos(): Observable<ApiResponse<Producto[]>> {
-    return this.apiService.get<Producto[]>(`${this.endpoint}/activos`);
+  deleteProducto(id: string): Observable<any> {
+    return this.apiService.delete<any>(`${this.endpoint}/${id}`);
   }
 
   /**
    * Obtiene productos por categoría
    */
-  getProductosByCategoria(categoriaId: number): Observable<ApiResponse<Producto[]>> {
+  getProductosByCategoria(categoriaId: string): Observable<Producto[]> {
     return this.apiService.get<Producto[]>(`${this.endpoint}/categoria/${categoriaId}`);
+  }
+
+  /**
+   * Obtiene productos por usuario
+   */
+  getProductosByUsuario(usuarioId: string): Observable<Producto[]> {
+    return this.apiService.get<Producto[]>(`${this.endpoint}/usuario/${usuarioId}`);
+  }
+
+  /**
+   * Busca productos por nombre
+   */
+  buscarProductos(nombre: string): Observable<Producto[]> {
+    return this.apiService.get<Producto[]>(`${this.endpoint}/buscar/${nombre}`);
+  }
+
+  /**
+   * Actualiza el stock de un producto
+   */
+  actualizarStock(id: string, nuevoStock: number): Observable<Producto> {
+    return this.apiService.patch<Producto>(`${this.endpoint}/${id}/stock`, { stock: nuevoStock });
   }
 }

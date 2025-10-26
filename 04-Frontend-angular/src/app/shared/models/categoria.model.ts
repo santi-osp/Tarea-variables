@@ -2,12 +2,13 @@
  * Modelo para la entidad Categoría
  */
 export interface Categoria {
-  id: number;
+  id_categoria: string; // UUID
+  id: string; // Alias for id_categoria for frontend compatibility
   nombre: string;
   descripcion?: string;
-  activa: boolean;
+  activa: boolean; // Status field
   fecha_creacion: string;
-  fecha_actualizacion: string;
+  fecha_edicion?: string;
 }
 
 /**
@@ -16,7 +17,6 @@ export interface Categoria {
 export interface CreateCategoriaRequest {
   nombre: string;
   descripcion?: string;
-  activa?: boolean;
 }
 
 /**
@@ -25,7 +25,6 @@ export interface CreateCategoriaRequest {
 export interface UpdateCategoriaRequest {
   nombre?: string;
   descripcion?: string;
-  activa?: boolean;
 }
 
 /**
@@ -33,7 +32,15 @@ export interface UpdateCategoriaRequest {
  */
 export interface CategoriaFilters {
   nombre?: string;
-  activa?: boolean;
-  fecha_desde?: string;
-  fecha_hasta?: string;
+  activa?: boolean; // Status filter
+}
+
+/**
+ * Modelo para respuesta paginada de categorías
+ */
+export interface CategoriaListResponse {
+  data: Categoria[];
+  totalPages: number;
+  currentPage: number;
+  totalItems: number;
 }
